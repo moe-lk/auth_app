@@ -1,0 +1,26 @@
+version: v2
+github:
+  # repository name
+  name: auth_server
+  # repository description
+  description: SSO generic oauth server for SIS
+  # add collaborators
+  collaborators:
+    - rultor
+    - mohamednizar
+extensions:
+  # generate README file and upload it
+  readme:
+    # Readme title
+    title: "SIS OAuth server"
+    # List of badges
+    badges:
+      - alt: Travis
+        img: https://img.shields.io/travis/moe-lk/auth_server/master.svg?style=flat-square
+        link: https://travis-ci.org/moe-lk/auth_server
+      - alt: Quality Score
+        img: https://img.shields.io/scrutinizer/g/moe-lk/auth_server.svg?style=flat-square
+        link: https://scrutinizer-ci.com/g/moe-lk/auth_server
+  # Enable https://www.0pdd.com/
+  0pdd:
+    verbose: true
