@@ -49,10 +49,10 @@ class LoginController extends Controller
     /**
      * @return string
      */
-    public function findUsername(){
+    public function findUsername() {
         $login = request()->input('username');
 
-        $fieldType  = filter_var($login,FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $fieldType = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
         request()->merge([$fieldType => $login]);
 
@@ -62,7 +62,7 @@ class LoginController extends Controller
     /**
      * @return string
      */
-    public function username(){
+    public function username() {
         return $this->username;
     }
 }
