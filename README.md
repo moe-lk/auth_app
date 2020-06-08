@@ -1,7 +1,7 @@
 # SIS generic oauth app
 
-[![Build Status](https://img.shields.io/travis/moe-lk/auth_server/master.svg?style=flat-square)](https://travis-ci.org/moe-lk/auth_server)
-[![Quality Score](https://img.shields.io/scrutinizer/g/moe-lk/auth_server.svg?style=flat-square)](https://scrutinizer-ci.com/g/moe-lk/auth_server)
+[![Build Status](https://img.shields.io/travis/moe-lk/auth_app/master.svg?style=flat-square)](https://travis-ci.org/moe-lk/auth_app)
+[![Quality Score](https://img.shields.io/scrutinizer/g/moe-lk/auth_app.svg?style=flat-square)](https://scrutinizer-ci.com/g/moe-lk/auth_app)
 
 
 This is a Generic Oauth application to facilitate authenticate SIS users to any application in relates to it by SSO 
