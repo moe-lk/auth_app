@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use GuzzleHttp\Client;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 class LoginController extends Controller
@@ -49,7 +51,8 @@ class LoginController extends Controller
     /**
      * @return string
      */
-    public function findUsername() {
+    public function findUsername()
+    {
         $login = request()->input('username');
 
         $fieldType = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
@@ -58,12 +61,78 @@ class LoginController extends Controller
 
         return $fieldType;
     }
-    
+
     /**
      * @return string
      */
-    public function username() {
+    public function username()
+    {
         return $this->username;
     }
-}
 
+    public function userOrg(Request $request)
+    {
+        $client = new Client(['base_uri' => env('GRAFANA_URL').'/api/']);
+        if ($request->user() && (!($request->user()->principal->isEmpty()))  && $request->user()->principal[0]->roles) {
+            dd($request->user()->principal[0]->roles->code);
+            switch ($request->user()->principal[0]->roles->code) {
+                case 'PRINCIPAL':
+                    $response = $client->request('post','orgs/2/users',[
+                        'headers' => [
+                            'Authorization' => 'Bearer '.env('GRAFANA_KEY'),
+                            'Accept' => 'application/json',
+                            'Content-Type' => 'application/json'
+                        ],
+                        'body' => [
+                            'role' => 'Viewer',
+                            'loginOrEmail' => $request->user()->email
+                        ]
+                    ]);
+                    dd($response);
+                    if($response){
+                        $data =
+                        [
+                            [
+                                "orgId" => 2,
+                                "userId" => $request->user()->id,
+                                "role" => 'Viewer',
+                                "name" => 'Schools',
+                                "email" => $request->user()->email,
+                                "login" => 'Schools',
+                            ]
+                        ];
+                    }
+                    break;
+                case 'PROVINCIAL_COORDINATOR':
+                    $data =
+                        [
+                            [
+                                "orgId" => 3,
+                                "userId" => $request->user()->user()->id,
+                                "role" => 'Viewer',
+                                "name" => 'province',
+                                "email" => $request->user()->user()->email,
+                                "login" => 'province',
+                            ]
+                        ];
+                case 'ZONAL_COORDINATOR':
+                    $data =
+                        [
+                            [
+                                "orgId" => 3,
+                                "userId" => $request->user()->user()->id,
+                                "role" => 'Viewer',
+                                "name" => 'zone',
+                                "email" => $request->user()->user()->email,
+                                "login" => 'zone',
+                            ]
+                        ];
+                default:
+                    # code...
+                    break;
+            }
+
+        }
+        return $data;
+    }
+}

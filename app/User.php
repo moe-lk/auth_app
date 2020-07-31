@@ -22,9 +22,7 @@ class User extends Authenticatable
 
     protected $table = 'security_users';
 
-    protected $appends = [
-        'special_need_name'
-    ];
+
 
     /**
      * Attributes that should be mass-assignable.
@@ -70,10 +68,7 @@ class User extends Authenticatable
     ];
 
 
-    public function getSpecialNeedNameAttribute()
-    {
-        return optional($this->special_needs())->special_need_difficulty_id;
-    }
+  
 
     /**
      * The attributes that should be casted to native types.
@@ -121,102 +116,26 @@ class User extends Authenticatable
 
     public function class()
     {
-        return $this->belongsTo('App\Models\Institution_class_student', 'id', 'student_id');
+        return $this->belongsTo('App\Institution_class_student', 'id', 'student_id');
     }
 
-    public function special_needs()
-    {
-        return $this->hasMany('App\Models\User_special_need', 'id', 'security_user_id');
+    public function principal(){
+        return $this->hasMany('App\Security_group_user','security_user_id','id')
+            ->where('security_group_users.security_role_id','=',4)
+            ->with(['security_group_institution','institution_staff','security_group'  , 'staff_class','institution_group' , 'roles']);
     }
 
-    public function genUUID()
-    {
-        $uuid = Uuid::generate(4);
-        return str_split($uuid, '8')[0];
+    public function zonal_cordinator(){
+        
+        return $this->hasMany('App\Security_group_user','security_user_id','id')
+            ->where('security_group_users.security_role_id','=',14)
+            ->with(['security_group_institution','institution_staff','security_group'  , 'staff_class','institution_group' , 'roles']);
     }
 
-    /**
-     * First level search for students
-     *
-     * @param array $student
-     * @return array
-     */
-    public function getMatches($student)
-    {
-        return $this->where([
-            'gender_id' => $student['gender'] + 1, // DoE id differs form MoE id
-            'date_of_birth' => $student['b_date'],
-            'institutions.code' => $student['schoolid']
-        ])
-            ->join('institution_students', 'security_users.id', 'institution_students.student_id')
-            ->join('institutions', 'institution_students.institution_id', 'institutions.id')
-            ->get()->toArray();
-    }
-
-    /**
-     * insert student data from examination
-     * @input array
-     * @return array
-     */
-    public function insertExaminationStudent($student)
-    {
-        $uniqueId = $this->uniqueUId::getUniqueAlphanumeric();
-        $studentData = [
-            'username' => str_replace('-', '', $uniqueId),
-            'openemis_no' => $uniqueId, // Openemis no is unique field, in case of the duplication it will failed
-            'first_name' => $student['f_name'], // here we save full name in the column of first name. re reduce breaks of the system.
-            'last_name' => genNameWithInitials($student['f_name']),
-            'gender_id' => $student['gender'] + 1,
-            'date_of_birth' => $student['b_date'],
-            'address' => $student['pvt_address'],
-            'is_student' => 1,
-            'created_user_id' => 1
-        ];
-        try {
-            $id = $this->insertGetId($studentData);
-            $studentData['id'] = $id;
-            $this->uniqueUserId->updateOrInsertRecord($studentData);
-            return $studentData;
-        } catch (\Exception $th) {
-            Log::error($th->getMessage());
-            // in case of duplication of the Unique ID this will recursive.
-            $this->insertExaminationStudent($student);
-        }
-        return $studentData;
-    }
-
-    /**
-     * Update the existing student's data
-     *
-     * @param array $student
-     * @param array $sis_student
-     * @return array
-     */
-    public function updateExaminationStudent($student, $sis_student)
-    {
-        // regenerate unique id if it's not available
-        $uniqueId = !$this->uniqueUId::isValidUniqueId($sis_student['openemis_no']) ? $this->uniqueUId::getUniqueAlphanumeric() : $sis_student['openemis_no'];
-
-        $studentData = [
-            'id' => $sis_student['id'],
-            'username' => str_replace('-', '', $uniqueId),
-            'openemis_no' => $uniqueId, // Openemis no is unique field, in case of the duplication it will failed
-            'first_name' => $student['f_name'], // here we save full name in the column of first name. re reduce breaks of the system.
-            'last_name' => genNameWithInitials($student['f_name']),
-            'date_of_birth' => $student['b_date'],
-            'address' => $student['pvt_address'],
-            'modified' => now()
-        ];
-
-        try {
-            $this->update($studentData);
-            $this->uniqueUserId->updateOrInsertRecord($studentData);
-            return $studentData;
-        } catch (\Exception $th) {
-            Log::error($th->getMessage());
-            // in case of duplication of the Unique ID this will recursive.
-            $this->updateExaminationStudent($student, $sis_student);
-        }
-        return $studentData;
+    public function provincial_cordinator(){
+        
+        return $this->hasMany('App\Security_group_user','security_user_id','id')
+            ->where('security_group_users.security_role_id','=',13)
+            ->with(['security_group_institution','institution_staff','security_group'  , 'staff_class','institution_group' , 'roles']);
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +19,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/user', function (Request $request) {
         $data['email'] = $request->user()->email;
         $data['name'] = $request->user()->last_name;
+        $data['id'] = 8553;
         $data['username'] = $request->user()->username;
         $data['info'] = [
             "groups" => [
@@ -37,20 +39,6 @@ Route::middleware('auth:api')->group(function () {
             ]
         ];
         return response()->json($data);
-        // return $request->user();
-    });
-    Route::get('/user/orgs', function (Request $request) {
-        return
-            [
-                [
-                    "orgId" => 2,
-                    "userId" => $request->user()->id,
-                    "role" => 'Viewer',
-                    "name" => 'Schools',
-                    "email" => $request->user()->email,
-                    "login" => 'Schools',
-                ]
-            ];
     });
     Route::get('/user/teams', function (Request $request) {
         return
@@ -67,8 +55,17 @@ Route::middleware('auth:api')->group(function () {
                 ]
             ];
     });
-    // return $request->user();
+    Route::get('/user/orgs','UserOrgs@getUserOrg');
+
+
+//     Route::group(['middleware' => ['cors', 'json.response']], function () {
+//     // ...
+
+// });
+
+    // Route::get('/user/orgs','Auth\LoginController@getUserOrg')->middleware("json.response");
 });
-// Route::get('/user/orgs','LoginController@getUserOrgs');
-// Route::middleware('auth:api','core')->post('/oauth/auth', 'GrafanaOAuth@auth');
+
+
+
 

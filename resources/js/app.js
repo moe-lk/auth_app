@@ -42,5 +42,5 @@ Vue.component(
 );
 
 const app = new Vue({
-    id: '#passport_auth',
+    el: 'body'
 });
