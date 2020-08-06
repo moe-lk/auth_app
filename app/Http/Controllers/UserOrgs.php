@@ -29,7 +29,7 @@ class UserOrgs extends Controller
             ])->getBody();
             $data = json_decode($response, true);
         } catch (\Throwable $th) {
-            $data = [];
+            $data =  $this->createGrafanaUser($request);
         }
         return $data;
     }
@@ -54,8 +54,6 @@ class UserOrgs extends Controller
                 ]
             ]);
         } catch (\Throwable $th) {
-            $this->createGrafanaUser($request);
-            $this->updateUserOrg($request, $data);
         }
     }
 
@@ -80,26 +78,28 @@ class UserOrgs extends Controller
                 ]
             ])->getBody();
             $data = json_decode($response, true);
-            $this->removeUserMainOrg($data);
+            return $data;
         } catch (\Throwable $th) {
-            //throw $th;
         }
     }
 
     public function removeUserMainOrg($data)
     {
-        $header = [
-            'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
-        ];
-        $client = new Client([
-            'base_uri' => env('GRAFANA_URL'),
-            'auth' => [env('GRAFANA_USER'), env('GRAFANA_PASSWORD')],
-        ]);
-        $client->request('DELETE', "/api/orgs/1", [
-            'auth' => [env('GRAFANA_USER'), env('GRAFANA_PASSWORD')],
-            'headers' =>  $header
-        ]);
+       try {
+            $header = [
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ];
+            $client = new Client([
+                'base_uri' => env('GRAFANA_URL'),
+                'auth' => [env('GRAFANA_USER'), env('GRAFANA_PASSWORD')],
+            ]);
+            $client->request('DELETE', "/api/orgs/1/users/{$data['user']['id']}", [
+                'auth' => [env('GRAFANA_USER'), env('GRAFANA_PASSWORD')],
+                'headers' =>  $header
+            ]);
+       } catch (\Throwable $th) {
+       }
     }
 
     public function getUserOrg(Request $request)
@@ -138,6 +138,7 @@ class UserOrgs extends Controller
                 $data['user'] = $data;
                 $data['orgId'] = 2;
                 $this->updateUserOrg($request, $data);
+                $this->removeUserMainOrg($data);
             }
             $data = [
                 [
@@ -156,6 +157,7 @@ class UserOrgs extends Controller
                 $data['user'] = $data;
                 $data['orgId'] = 4;
                 $this->updateUserOrg($request, $data);
+                $this->removeUserMainOrg($data);
             }
             $data = [
                 [
@@ -174,6 +176,7 @@ class UserOrgs extends Controller
                 $data['user'] = $data;
                 $data['orgId'] = 5;
                 $this->updateUserOrg($request, $data);
+                $this->removeUserMainOrg($data);
             }
             $data = [
                 [
