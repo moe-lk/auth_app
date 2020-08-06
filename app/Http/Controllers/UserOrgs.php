@@ -54,8 +54,8 @@ class UserOrgs extends Controller
                 ]
             ]);
         } catch (\Throwable $th) {
-            $this->createGrafanaUser($request);
-            $this->updateUserOrg($request, $data);
+            // $this->createGrafanaUser($request);
+            // $this->updateUserOrg($request, $data);
         }
     }
 
@@ -104,7 +104,34 @@ class UserOrgs extends Controller
 
     public function getUserOrg(Request $request)
     {
-        if ($request->user() &&  (!($request->user()->principal->isEmpty()))  && !is_null($request->user()->principal) && ($request->user()->principal[0]->roles->code == 'PRINCIPAL')) {
+        if($request->user()->super_admin){
+            $data = [
+                [
+                    "orgId" => 2,
+                    "userId" => $request->user()->id,
+                    "role" => 'Admin',
+                    "name" => 'Schools',
+                    "email" => $request->user()->username,
+                    "login" => 'Schools',
+                ],
+                [
+                    "orgId" => 4,
+                    "userId" => $request->user()->id,
+                    "role" => 'Admin',
+                    "name" => 'Zones',
+                    "email" => $request->user()->username,
+                    "login" => 'Zones',
+                ],
+                [
+                    "orgId" => 5,
+                    "userId" => $request->user()->id,
+                    "role" => 'Admin',
+                    "name" => 'Provinces',
+                    "email" => $request->user()->username,
+                    "login" => 'Provinces',
+                ]
+            ];
+        }elseif ($request->user() &&  (!($request->user()->principal->isEmpty()))  && !is_null($request->user()->principal) && ($request->user()->principal[0]->roles->code == 'PRINCIPAL')) {
             $data = $this->checkOrg($request);
             if (empty($data) || ( (!empty($data['orgId']) && $data['orgId'] !== 2))) {
                 $request['data'] = $data;
@@ -117,32 +144,14 @@ class UserOrgs extends Controller
                     "orgId" => 2,
                     "userId" => $request->user()->id,
                     "role" => 'Viewer',
-                    "name" => 'schools',
+                    "name" => 'Schools',
                     "email" => $request->user()->username,
-                    "login" => 'schools',
+                    "login" => 'Schools',
                 ]
             ];
         } elseif ($request->user()  &&  (!($request->user()->zonal_cordinator->isEmpty())) && !is_null($request->user()->zonal_cordinator) && ($request->user()->zonal_cordinator[0]->roles->code == 'ZONAL_COORDINATOR')) {
             $data = $this->checkOrg($request);
-            if (empty($data) || ((!empty($data['orgId']) && $data['orgId'] !== 3))) {
-                $request['data'] = $data;
-                $data['user'] = $data;
-                $data['orgId'] = 3;
-                $this->updateUserOrg($request, $data);
-            }
-            $data = [
-                [
-                    "orgId" => 3,
-                    "userId" => $request->user()->id,
-                    "role" => 'Viewer',
-                    "name" => 'zone',
-                    "email" => $request->user()->username,
-                    "login" => 'zone',
-                ]
-            ];
-        } elseif ($request->user() &&  (!($request->user()->provincial_cordinator->isEmpty())) && !is_null($request->user()->provincial_cordinator) && ($request->user()->provincial_cordinator[0]->roles->code == 'PROVINCIAL_COORDINATOR')) {
-            $data = $this->checkOrg($request);
-            if (empty($data)  || ((!empty($data['orgId']) && $data['orgId'] !== 4))) {
+            if (empty($data) || ((!empty($data['orgId']) && $data['orgId'] !== 4))) {
                 $request['data'] = $data;
                 $data['user'] = $data;
                 $data['orgId'] = 4;
@@ -153,9 +162,27 @@ class UserOrgs extends Controller
                     "orgId" => 4,
                     "userId" => $request->user()->id,
                     "role" => 'Viewer',
-                    "name" => 'province',
+                    "name" => 'Zones',
                     "email" => $request->user()->username,
-                    "login" => 'province',
+                    "login" => 'Zones',
+                ]
+            ];
+        } elseif ($request->user() &&  (!($request->user()->provincial_cordinator->isEmpty())) && !is_null($request->user()->provincial_cordinator) && ($request->user()->provincial_cordinator[0]->roles->code == 'PROVINCIAL_COORDINATOR')) {
+            $data = $this->checkOrg($request);
+            if (empty($data)  || ((!empty($data['orgId']) && $data['orgId'] !== 5))) {
+                $request['data'] = $data;
+                $data['user'] = $data;
+                $data['orgId'] = 5;
+                $this->updateUserOrg($request, $data);
+            }
+            $data = [
+                [
+                    "orgId" => 5,
+                    "userId" => $request->user()->id,
+                    "role" => 'Viewer',
+                    "name" => 'Provinces',
+                    "email" => $request->user()->username,
+                    "login" => 'Provinces',
                 ]
             ];
         }
