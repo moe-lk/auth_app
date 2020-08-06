@@ -29,7 +29,8 @@ class UserOrgs extends Controller
             ])->getBody();
             $data = json_decode($response, true);
         } catch (\Throwable $th) {
-            $data =  $this->createGrafanaUser($request);
+             $this->createGrafanaUser($request);
+             $data = $this->checkOrg($request);
         }
         return $data;
     }
