@@ -54,8 +54,8 @@ class UserOrgs extends Controller
                 ]
             ]);
         } catch (\Throwable $th) {
-            // $this->createGrafanaUser($request);
-            // $this->updateUserOrg($request, $data);
+            $this->createGrafanaUser($request);
+            $this->updateUserOrg($request, $data);
         }
     }
 
