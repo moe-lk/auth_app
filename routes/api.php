@@ -55,15 +55,7 @@ Route::middleware('auth:api')->group(function () {
                 ]
             ];
     });
-    Route::get('/user/orgs','UserOrgs@getUserOrg');
-
-
-//     Route::group(['middleware' => ['cors', 'json.response']], function () {
-//     // ...
-
-// });
-
-    // Route::get('/user/orgs','Auth\LoginController@getUserOrg')->middleware("json.response");
+    Route::get('/user/orgs','GrafanaOauth@getUserOrg');
 });
 
 
