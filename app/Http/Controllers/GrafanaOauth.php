@@ -104,6 +104,7 @@ class GrafanaOauth extends Controller
 
     public function getUserOrg(Request $request)
     {
+        $data = [];
         if($request->user()->super_admin){
             $data = [
                 [
