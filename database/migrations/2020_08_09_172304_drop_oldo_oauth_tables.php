@@ -14,9 +14,13 @@ class DropOldoOauthTables extends Migration
      */
     public function up()
     {
-       DB::statement("SELECT CONCAT( 'DROP TABLE ', GROUP_CONCAT(table_name) , ';' ) 
-       AS statement FROM information_schema.tables 
-       WHERE table_name LIKE 'oauth_auth%';");
+        Schema::dropIfExists('oauth_access_tokens');
+        Schema::dropIfExists('oauth_auth_codes');
+        Schema::dropIfExists('oauth_clients');
+        Schema::dropIfExists('oauth_personal_access_clients');
+        Schema::dropIfExists('oauth_refresh_tokens');
+       DB::table('migrations')->where('migration','like','%_create_oauth_%')
+       ->delete();
     }
 
     /**
