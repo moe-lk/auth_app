@@ -73,7 +73,7 @@ class GrafanaOauth extends Controller
                 'json' => [
                     'name' => $request->user()->last_name,
                     'login' => $request->user()->username,
-                    'email' => $request->user()->email,
+                    'email' => $request->user()->email ? $request->user()->email : $request->user()->username.'@'.'sis.moe.gov.lk' ,
                     'password' =>  Str::random(8),
                 ]
             ])->getBody();
