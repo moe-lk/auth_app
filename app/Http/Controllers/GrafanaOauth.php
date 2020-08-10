@@ -21,10 +21,10 @@ class GrafanaOauth extends Controller
         $client = new Client([
             'base_uri' => env('GRAFANA_URL'),
             'auth' => [env('GRAFANA_USER'), env('GRAFANA_PASSWORD')],
+            'headers' =>  $header
         ]);
         try {
-            $response = $client->request('GET', "/api/users/lookup?loginOrEmail={$userLogin}", [
-                'headers' =>  $header
+            $response = $client->get("/api/users/lookup?loginOrEmail={$userLogin}", [
             ])->getBody();
             $data = json_decode($response, true);
         } catch (\Throwable $th) {
@@ -43,11 +43,10 @@ class GrafanaOauth extends Controller
         $client = new Client([
             'base_uri' => env('GRAFANA_URL'),
             'auth' => [env('GRAFANA_USER'), env('GRAFANA_PASSWORD')],
+            'headers' =>  $header
         ]);
         try {
-            $client->request('POST', "/api/orgs/{$data['orgId']}/users", [
-                'auth' => [env('GRAFANA_USER'), env('GRAFANA_PASSWORD')],
-                'headers' =>  $header,
+            $client->post( "/api/orgs/{$data['orgId']}/users", [
                 'json' => [
                     'role' => 'Viewer',
                     'loginOrEmail' => $request->user()->username
@@ -67,9 +66,9 @@ class GrafanaOauth extends Controller
             $client = new Client([
                 'base_uri' => env('GRAFANA_URL'),
                 'auth' => [env('GRAFANA_USER'), env('GRAFANA_PASSWORD')],
+                'headers' =>  $header,
             ]);
             $response = $client->request('POST', '/api/admin/users', [
-                'headers' =>  $header,
                 'json' => [
                     'name' => $request->user()->last_name,
                     'login' => $request->user()->username,
@@ -93,11 +92,9 @@ class GrafanaOauth extends Controller
             $client = new Client([
                 'base_uri' => env('GRAFANA_URL'),
                 'auth' => [env('GRAFANA_USER'), env('GRAFANA_PASSWORD')],
+                'headers' =>  $header,
             ]);
-            $client->request('DELETE', "/api/orgs/1/users/{$data['user']['id']}", [
-                'auth' => [env('GRAFANA_USER'), env('GRAFANA_PASSWORD')],
-                'headers' =>  $header
-            ]);
+            $client->delete("/api/orgs/1/users/{$data['user']['id']}");
        } catch (\Throwable $th) {
        }
     }
