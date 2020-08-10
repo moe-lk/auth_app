@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/user', function (Request $request) {
-        $data['email'] = $request->user()->email ? $request->user()->email : $request->user()->username.'@'.'sis.moe.gov.lk' ;
+        $data['email'] = $request->user()->email ? $request->user()->email : $request->user()->username.'@sis.moe.gov.lk' ;
         $data['name'] = $request->user()->last_name;
         $data['username'] = $request->user()->username;
         return response()->json($data);

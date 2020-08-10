@@ -49,7 +49,7 @@ class GrafanaOauth extends Controller
             $promise = $client->post("/api/orgs/{$data['orgId']}/users", [
                 'json' => [
                     'role' => 'Viewer',
-                    'loginOrEmail' => $request->user()->username
+                    'loginOrEmail' => $data['user']['login']
                 ]
             ]);
         } catch (\Throwable $th) {
@@ -94,12 +94,11 @@ class GrafanaOauth extends Controller
             $client = new Client([
                 'base_uri' => env('GRAFANA_URL'),
                 'auth' => [env('GRAFANA_USER'), env('GRAFANA_PASSWORD')],
-                'headers' =>  $header
+                'headers' =>  $header,
             ]);
-
             $client->delete("/api/orgs/1/users/{$data['user']['id']}");
-        } catch (\Throwable $th) {
-        }
+       } catch (\Throwable $th) {
+       }
     }
 
     public function getUserOrg(Request $request)
