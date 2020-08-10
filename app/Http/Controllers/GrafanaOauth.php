@@ -21,15 +21,14 @@ class GrafanaOauth extends Controller
         $client = new Client([
             'base_uri' => env('GRAFANA_URL'),
             'auth' => [env('GRAFANA_USER'), env('GRAFANA_PASSWORD')],
+            'headers' =>  $header
         ]);
         try {
-            $response = $client->request('GET', "/api/users/lookup?loginOrEmail={$userLogin}", [
-                'headers' =>  $header
-            ])->getBody();
+            $response = $client->get("/api/users/lookup?loginOrEmail={$userLogin}")->getBody();
             $data = json_decode($response, true);
         } catch (\Throwable $th) {
-             $this->createGrafanaUser($request);
-             $data = $this->checkOrg($request);
+            $this->createGrafanaUser($request);
+            $data = $this->checkOrg($request);
         }
         return $data;
     }
@@ -43,11 +42,12 @@ class GrafanaOauth extends Controller
         $client = new Client([
             'base_uri' => env('GRAFANA_URL'),
             'auth' => [env('GRAFANA_USER'), env('GRAFANA_PASSWORD')],
+            'headers' =>  $header
         ]);
+
         try {
-            $client->request('POST', "/api/orgs/{$data['orgId']}/users", [
+            $client->post("/api/orgs/{$data['orgId']}/users", [
                 'auth' => [env('GRAFANA_USER'), env('GRAFANA_PASSWORD')],
-                'headers' =>  $header,
                 'json' => [
                     'role' => 'Viewer',
                     'loginOrEmail' => $request->user()->username
@@ -64,16 +64,18 @@ class GrafanaOauth extends Controller
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
             ];
+
             $client = new Client([
                 'base_uri' => env('GRAFANA_URL'),
                 'auth' => [env('GRAFANA_USER'), env('GRAFANA_PASSWORD')],
+                'headers' =>  $header
             ]);
-            $response = $client->request('POST', '/api/admin/users', [
-                'headers' =>  $header,
+
+            $response = $client->post('/api/admin/users', [
                 'json' => [
                     'name' => $request->user()->last_name,
                     'login' => $request->user()->username,
-                    'email' => $request->user()->email ? $request->user()->email : $request->user()->username.'@'.'sis.moe.gov.lk' ,
+                    'email' => $request->user()->email ? $request->user()->email : $request->user()->username . '@' . 'sis.moe.gov.lk',
                     'password' =>  Str::random(8),
                 ]
             ])->getBody();
@@ -85,7 +87,7 @@ class GrafanaOauth extends Controller
 
     public function removeUserMainOrg($data)
     {
-       try {
+        try {
             $header = [
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
@@ -93,19 +95,17 @@ class GrafanaOauth extends Controller
             $client = new Client([
                 'base_uri' => env('GRAFANA_URL'),
                 'auth' => [env('GRAFANA_USER'), env('GRAFANA_PASSWORD')],
-            ]);
-            $client->request('DELETE', "/api/orgs/1/users/{$data['user']['id']}", [
-                'auth' => [env('GRAFANA_USER'), env('GRAFANA_PASSWORD')],
                 'headers' =>  $header
             ]);
-       } catch (\Throwable $th) {
-       }
+
+            $client->delete("/api/orgs/1/users/{$data['user']['id']}");
+        } catch (\Throwable $th) {
+        }
     }
 
     public function getUserOrg(Request $request)
     {
-        $data = [];
-        if($request->user()->super_admin){
+        if ($request->user()->super_admin) {
             $data = [
                 [
                     "orgId" => 2,
@@ -132,9 +132,9 @@ class GrafanaOauth extends Controller
                     "login" => 'Provinces',
                 ]
             ];
-        }elseif ($request->user() &&  (!($request->user()->principal->isEmpty()))  && !is_null($request->user()->principal) && ($request->user()->principal[0]->roles->code == 'PRINCIPAL')) {
+        } elseif ($request->user() &&  (!($request->user()->principal->isEmpty()))  && !is_null($request->user()->principal) && ($request->user()->principal[0]->roles->code == 'PRINCIPAL')) {
             $data = $this->checkOrg($request);
-            if (empty($data) || ( (!empty($data['orgId']) && $data['orgId'] !== 2))) {
+            if (empty($data) || ((!empty($data['orgId']) && $data['orgId'] !== 2))) {
                 $request['data'] = $data;
                 $data['user'] = $data;
                 $data['orgId'] = 2;
@@ -170,7 +170,7 @@ class GrafanaOauth extends Controller
                     "login" => 'Zones',
                 ]
             ];
-        } elseif ($request->user() &&  (!($request->user()->provincial_cordinator->isEmpty())) && !is_null($request->user()->provincial_cordinator) && ($request->user()->provincial_cordinator[0]->roles->code == 'PROVINCIAL_COORDINATOR')) {
+        } elseif ($request->user()  &&  (!is_null($request->user()->zonal_cordinator) && ($request->user()->zonal_cordinator[0]->roles->code == 'ZONAL_COORDINATOR'))) {
             $data = $this->checkOrg($request);
             if (empty($data)  || ((!empty($data['orgId']) && $data['orgId'] !== 5))) {
                 $request['data'] = $data;
