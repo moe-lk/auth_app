@@ -38,6 +38,7 @@ Route::middleware('auth:api')->group(function () {
             ];
     });
     Route::get('/user/orgs','GrafanaOauth@getUserOrg');
+
 });
 
 
