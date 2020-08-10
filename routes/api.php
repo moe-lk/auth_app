@@ -19,25 +19,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/user', function (Request $request) {
         $data['email'] = $request->user()->email ? $request->user()->email : $request->user()->email.'@sis.moe.gov.lk';
         $data['name'] = $request->user()->last_name;
-        $data['id'] = 8553;
         $data['username'] = $request->user()->username;
-        $data['info'] = [
-            "groups" => [
-                'school',
-            ],
-            'company' => [
-                "orgId" => 2,
-                "userId" => $request->user()->id,
-                "role" => 'Viewer',
-                "name" => 'Schools',
-                "email" => $request->user()->email,
-                "login" => 'Schools',
-            ],
-            'role' => [
-                'Editor',
-                'Viewer'
-            ]
-        ];
         return response()->json($data);
     });
     Route::get('/user/teams', function (Request $request) {
