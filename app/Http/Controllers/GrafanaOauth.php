@@ -49,7 +49,7 @@ class GrafanaOauth extends Controller
             $client->post( "/api/orgs/{$data['orgId']}/users", [
                 'json' => [
                     'role' => 'Viewer',
-                    'loginOrEmail' => $request->user()->username
+                    'loginOrEmail' => $data['user']['login']
                 ]
             ]);
         } catch (\Throwable $th) {
