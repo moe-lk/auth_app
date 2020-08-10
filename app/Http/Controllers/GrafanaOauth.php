@@ -12,7 +12,7 @@ class GrafanaOauth extends Controller
 
     public function checkOrg(Request $request)
     {
-        $userLogin = $request->user()->email;
+        $userLogin = $request->user()->username;
         $header = [
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
@@ -38,10 +38,10 @@ class GrafanaOauth extends Controller
         $header = [
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
+            'Authorization' => "Bearer ".env('GRAFANA_KEY')
         ];
         $client = new Client([
             'base_uri' => env('GRAFANA_URL'),
-            'auth' => [env('GRAFANA_USER'), env('GRAFANA_PASSWORD')],
             'headers' =>  $header
         ]);
 
