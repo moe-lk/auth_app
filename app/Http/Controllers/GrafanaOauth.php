@@ -46,16 +46,12 @@ class GrafanaOauth extends Controller
         ]);
 
         try {
-            $promise = $client->postAsync("/api/orgs/{$data['orgId']}/users", [
-                'auth' => [env('GRAFANA_USER'), env('GRAFANA_PASSWORD')],
+            $promise = $client->post("/api/orgs/{$data['orgId']}/users", [
                 'json' => [
                     'role' => 'Viewer',
                     'loginOrEmail' => $request->user()->username
                 ]
             ]);
-            $promise->then(function() use ($data){
-                $this->removeUserMainOrg($data);
-            });
         } catch (\Throwable $th) {
         }
     }
