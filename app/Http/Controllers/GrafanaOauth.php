@@ -28,7 +28,7 @@ class GrafanaOauth extends Controller
             $data = json_decode($response, true);
         } catch (\Throwable $th) {
             $this->createGrafanaUser($request);
-            $data = $this->checkOrg($request);
+            $data = [];
         }
         return $data;
     }
@@ -46,13 +46,16 @@ class GrafanaOauth extends Controller
         ]);
 
         try {
-            $client->post("/api/orgs/{$data['orgId']}/users", [
+            $promise = $client->postAsync("/api/orgs/{$data['orgId']}/users", [
                 'auth' => [env('GRAFANA_USER'), env('GRAFANA_PASSWORD')],
                 'json' => [
                     'role' => 'Viewer',
                     'loginOrEmail' => $request->user()->username
                 ]
             ]);
+            $promise->then(function() use ($data){
+                $this->removeUserMainOrg($data);
+            });
         } catch (\Throwable $th) {
         }
     }
@@ -139,7 +142,6 @@ class GrafanaOauth extends Controller
                 $data['user'] = $data;
                 $data['orgId'] = 2;
                 $this->updateUserOrg($request, $data);
-                $this->removeUserMainOrg($data);
             }
             $data = [
                 [
@@ -158,7 +160,6 @@ class GrafanaOauth extends Controller
                 $data['user'] = $data;
                 $data['orgId'] = 4;
                 $this->updateUserOrg($request, $data);
-                $this->removeUserMainOrg($data);
             }
             $data = [
                 [
@@ -177,7 +178,6 @@ class GrafanaOauth extends Controller
                 $data['user'] = $data;
                 $data['orgId'] = 5;
                 $this->updateUserOrg($request, $data);
-                $this->removeUserMainOrg($data);
             }
             $data = [
                 [
