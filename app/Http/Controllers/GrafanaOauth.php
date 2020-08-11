@@ -10,6 +10,12 @@ use Illuminate\Http\Request;
 class GrafanaOauth extends Controller
 {
 
+    /**
+     * check the user if exist in the Grafana
+     *
+     * @param Request $request
+     * @return void
+     */
     public function checkOrg(Request $request)
     {
         $userLogin = $request->user()->email;
@@ -24,16 +30,22 @@ class GrafanaOauth extends Controller
             'headers' =>  $header
         ]);
         try {
-            $response = $client->get("/api/users/lookup?loginOrEmail={$userLogin}", [
-            ])->getBody();
+            $response = $client->get("/api/users/lookup?loginOrEmail={$userLogin}", [])->getBody();
             $data = json_decode($response, true);
         } catch (\Throwable $th) {
-             $this->createGrafanaUser($request);
-             $data = $this->checkOrg($request);
+            $this->createGrafanaUser($request);
+            $data = $this->checkOrg($request);
         }
         return $data;
     }
 
+    /**
+     * update user in Grafana Org 
+     *
+     * @param Request $request
+     * @param [type] $data
+     * @return void
+     */
     public function updateUserOrg(Request $request, $data)
     {
         $header = [
@@ -46,7 +58,7 @@ class GrafanaOauth extends Controller
             'headers' =>  $header
         ]);
         try {
-            $client->post( "/api/orgs/{$data['orgId']}/users", [
+            $client->post("/api/orgs/{$data['orgId']}/users", [
                 'json' => [
                     'role' => 'Viewer',
                     'loginOrEmail' => $data['user']['login']
@@ -56,6 +68,12 @@ class GrafanaOauth extends Controller
         }
     }
 
+    /**
+     * Create the user in Grafana
+     *
+     * @param Request $request
+     * @return void
+     */
     public function createGrafanaUser(Request $request)
     {
         try {
@@ -82,9 +100,15 @@ class GrafanaOauth extends Controller
         }
     }
 
+    /**
+     * Remove user form main Org
+     *
+     * @param [type] $data
+     * @return void
+     */
     public function removeUserMainOrg($data)
     {
-       try {
+        try {
             $header = [
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
@@ -95,13 +119,19 @@ class GrafanaOauth extends Controller
                 'headers' =>  $header,
             ]);
             $client->delete("/api/orgs/1/users/{$data['user']['id']}");
-       } catch (\Throwable $th) {
-       }
+        } catch (\Throwable $th) {
+        }
     }
 
+    /**
+     *  get the user org for according to the Role in SIS
+     *
+     * @param Request $request
+     * @return void
+     */
     public function getUserOrg(Request $request)
     {
-        if($request->user()->super_admin){
+        if ($request->user()->super_admin) {
             $data = [
                 [
                     "orgId" => 2,
@@ -128,9 +158,9 @@ class GrafanaOauth extends Controller
                     "login" => 'Provinces',
                 ]
             ];
-        }elseif ($request->user() &&  (!($request->user()->principal->isEmpty()))  && !is_null($request->user()->principal) && ($request->user()->principal[0]->roles->code == 'PRINCIPAL')) {
+        } elseif ($request->user() &&  (!($request->user()->principal->isEmpty()))  && !is_null($request->user()->principal) && ($request->user()->principal[0]->roles->code == 'PRINCIPAL')) {
             $data = $this->checkOrg($request);
-            if (empty($data) || ( (!empty($data['orgId']) && $data['orgId'] !== 2))) {
+            if (empty($data) || ((!empty($data['orgId']) && $data['orgId'] !== 2))) {
                 $request['data'] = $data;
                 $data['user'] = $data;
                 $data['orgId'] = 2;
